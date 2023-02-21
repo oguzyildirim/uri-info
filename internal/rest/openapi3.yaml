@@ -1,0 +1,125 @@
+components:
+  requestBodies:
+    SearchURLsRequest:
+      content:
+        application/json:
+          schema:
+            properties:
+              URL:
+                minLength: 10
+                type: string
+      description: Request used for creating a URL info.
+      required: true
+  responses:
+    ErrorResponse:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                type: string
+      description: Response when errors happen.
+    ReadURLsByCountryResponse:
+      content:
+        application/json:
+          schema:
+            properties:
+              URL:
+                $ref: '#/components/schemas/URL'
+      description: Response returned back after searching URLs by country.
+    ReadURLsResponse:
+      content:
+        application/json:
+          schema:
+            properties:
+              URL:
+                $ref: '#/components/schemas/URL'
+      description: Response returned back after searching one URL.
+    SearchURLsResponse:
+      content:
+        application/json:
+          schema:
+            properties:
+              URL:
+                $ref: '#/components/schemas/URL'
+      description: Response returned back after creating URLs.
+  schemas:
+    URL:
+      properties:
+        HTMLVersion:
+          type: string
+        HaveLoginForm:
+          type: boolean
+        headingsCount:
+          type: string
+        id:
+          format: uuid
+          type: string
+        inaccessibleLinksCount:
+          format: int32
+          type: integer
+        linksCount:
+          format: int32
+          type: integer
+        pageTitle:
+          type: string
+      type: object
+info:
+  contact:
+    url: https://github.com/Oguzyildirim/url-info
+  description: REST APIs used for interacting with the URL Service
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: URL API
+  version: 0.0.0
+openapi: 3.0.0
+paths:
+  /URLs:
+    post:
+      operationId: CreateURL
+      requestBody:
+        $ref: '#/components/requestBodies/SearchURLsRequest'
+      responses:
+        "201":
+          $ref: '#/components/responses/SearchURLsResponse'
+        "400":
+          $ref: '#/components/responses/ErrorResponse'
+        "500":
+          $ref: '#/components/responses/ErrorResponse'
+  /URLs/{URLId}:
+    delete:
+      operationId: DeleteURL
+      parameters:
+      - in: path
+        name: URLId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "200":
+          description: URL updated
+        "404":
+          description: URL not found
+        "500":
+          $ref: '#/components/responses/ErrorResponse'
+    get:
+      operationId: ReadURL
+      parameters:
+      - in: path
+        name: URLId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "200":
+          $ref: '#/components/responses/ReadURLsResponse'
+        "404":
+          description: URL not found
+        "500":
+          $ref: '#/components/responses/ErrorResponse'
+servers:
+- description: Local development
+  url: http://127.0.0.1:9234
